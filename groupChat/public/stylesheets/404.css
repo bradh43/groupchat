@@ -1,0 +1,42 @@
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'segoeui','Segoe UI', sans-serif;
+    overflow: hidden;
+}
+.background{
+    font-family: 'segoeui','Segoe UI', sans-serif;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0px;
+    background: radial-gradient(
+        #00aff0,
+        #22cbff
+    );
+
+    text-align: center;
+    color: white;
+}
+.content-404 {
+    width: 50%;
+    height: auto;
+    margin: 50px auto;
+    
+}
+.content-404 img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+}
+.content-404 + h1 {
+    width: 80%;
+    margin: 0 auto;
+}

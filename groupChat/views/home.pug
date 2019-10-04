@@ -1,0 +1,291 @@
+doctype html
+//
+  Brad Hodkinson
+  03/25/19
+  CSE 330
+  Module CP GroupChat
+head
+  // Set up settings
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  meta(name='description' content='Simple multi-room chat')
+  meta(name='keywords' content='GroupChat')
+  meta(name='author' content='Brad Hodkinson')
+  // <meta http-equiv="refresh" content="300">
+  // Link javascript and css
+  link(href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css' rel='stylesheet')
+  link(href='/stylesheets/emoji.css' rel='stylesheet')
+  link(rel='stylesheet' href='/stylesheets/root.css')
+  link(rel='stylesheet' href='/stylesheets/home.css')
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  script(src='/socket.io/socket.io.js')
+  script(src='/javascripts/home.js')
+  title GroupChat
+.background
+  .side-nav-bar
+    ul
+      li.home-menu
+        #toggle-menu-button.primary-button
+          span#menu-tooltip.tooltip Menu
+          img(src='/assets/icons/conversation.png' alt='menu')
+      li
+        #view-profile.secondary-button
+          span#profile-tooltip.tooltip My Profile
+          img(src='/assets/icons/user.png' alt='profile')
+      li
+        #view-chat-list.secondary-button
+          span#chat-tooltip.tooltip Chats
+          img(src='/assets/icons/group.png' alt='chats')
+      li
+        #view-contact-list.secondary-button
+          span#contact-tooltip.tooltip Contacts
+          img(src='/assets/icons/contact.png' alt='contacts')
+      li
+        #view-setting.secondary-button
+          span#setting-tooltip.tooltip Settings
+          img(src='/assets/icons/setting.png' alt='settings')
+  #side-menu.side-menu
+    // Add create new chat with option for dm or group
+    .drawer-top
+      .drawer-header
+        h2#drawer-title Chats
+        #add-chat-button.secondary-button.add-chat
+          span#add-tooltip.tooltip Add chat
+          img(src='/assets/icons/edit.png' alt='add')
+      .line-break
+      #edit-drop-down-menu.edit-menu
+        #add-group-chat.edit-menu-item
+          img(src='/assets/icons/group.png' alt='')
+          h3 Start Group
+        #add-direct-chat.edit-menu-item
+          img(src='/assets/icons/user.png' alt='')
+          h3 Start Direct Message
+      .search
+        form(autocomplete='off')
+          input#search-input(type='text' placeholder='Search Chats' autocomplete='off')
+    .drawer-content
+      #drawer-chat-list.chat-result
+        img#loading-chat-list(src='/assets/icons/loading.gif' alt='loading...')
+      #drawer-contact-list.chat-result
+        img#loading-contact-list(src='/assets/icons/loading.gif' alt='loading...')
+  #content.content
+    #home.home
+      img(src='/assets/icons/logo.png' alt='Home')
+      h4
+        | Make it a great day, 
+        strong#welcome-username Username
+        | .
+      h4 Pop open a chat to start the conversation.
+    #setting.setting
+      h1 Settings
+      .setting-box
+        .line-break
+        .row.setting-row
+          label Time format: 
+          .setting-select
+            select#setting-time-format-select
+              option(value='0') Standard
+              option(value='1') Military
+        .line-break
+        .row.setting-row
+          label Theme: 
+          .setting-select
+            select#setting-theme-select
+              option(value='0') Light
+              option(value='1') Dark
+        .line-break
+        .row.setting-row
+          #setting-logout-button Logout
+    #profile-page.profile-page
+      .row.profile-row
+        .profile-picture
+          img#profile-user-picture(src='https://robohash.org/Username.png' alt='profile')
+          #edit-profile-image.edit-profile-image Edit
+          form(action='/api/chat/uploadProfileImage' method='POST' enctype='multipart/form-data')
+            input#edit-profile-image-selector(name='profile-image' type='file' accept='image/*')
+            input#edit-profile-image-submit(type='submit')
+      .row.profile-row
+        h2#profile-username Username
+      .row.profile-row
+        label First Name: 
+        input#profile-edit-first-name.edit-disabled(type='text' placeholder='First Name' disabled='')
+        #profile-edit-first-name-button.edit-button Edit
+      .row.profile-row
+        label Last Name: 
+        input#profile-edit-last-name.edit-disabled(type='text' placeholder='Laste Name' disabled='')
+        #profile-edit-last-name-button.edit-button Edit
+      .row.profile-row
+        label Email: 
+        input#profile-edit-email.edit-disabled(type='text' placeholder='Email' disabled='')
+        #profile-edit-email-button.edit-button Edit
+      .row.profile-row
+        label Password:
+        label#profile-password-label.profile-password-label ********
+        input#profile-edit-current-password(type='password' placeholder='Current Password')
+        #profile-edit-password-button.edit-button Edit
+      .row.profile-row
+        input#profile-edit-new-password(type='password' placeholder='New Password')
+      .row.profile-row
+        input#profile-edit-confirm-password(type='password' placeholder='Confirm Password')
+        #profile-save-password-button.profile-save-button Save
+        #profile-cancel-password-button.profile-cancel-button Cancel
+      .row.profile-row
+        p#profile-error-field
+      .line-break
+      .row.profile-row
+        #delete-account-button Delete Account
+      .row.profile-row
+        #profile-logout-button Logout
+    #header-title-bar.title-bar
+    #hamburger.hamburger-menu
+      .hamburger-button
+        span.line.line1
+        span.line.line2
+        span.line.line3
+    #hamburger-slide-menu.hamburger-slide-menu
+      .hamburger-menu-content
+        ul
+          li#hamburger-chat-button Chats
+          li#hamburger-contact-button Contacts
+          li#hamburger-profile-button Profile
+          li#hamburger-setting-button Settings
+    #chat-title-bar.title-bar
+      .group-chat-picture
+        img#group-chat-header-picture(src='https://robohash.org/delete.png' alt='profile')
+      h1#chat-title-bar-header Group Chat Name
+      span.title-bar-header-button
+        span#close-chat.close.close-chat &times;
+        span.tooltip Close
+      .title-bar-header-button
+        #group-chat-menu-button
+        span.tooltip Chat Menu
+    #chat-drop-down-menu.chat-drop-down-menu.hidden
+      .row.menu-row
+        p#chat-description Description
+      .line-break
+      #chat-setting-profile-image.group-chat-picture
+        img(src='https://robohash.org/delete.png' alt='profile')
+      ul
+        li#chat-member-button
+          .row-icon
+            img(src='/assets/icons/group.png' alt='members')
+          strong#chat-member-count 22
+          |  Members
+        li#chat-setting-button
+          .row-icon
+            img(src='/assets/icons/setting.png' alt='settings')
+          |                     Settings
+    .message-list-scroll-field
+      #message-list.message-list(data-chat='')
+    #input-message-bar.input-message-bar
+      input#message-input(type='text' placeholder='Send Message...' data-emojiable='true')
+      .send-button
+        .send-button
+          span#send-button
+  #add-group-chat-modal.modal
+    .modal-content
+      .modal-header
+        h1
+          | New Group
+          span.modal-header-button
+            span.close.close-modal &times;
+            span.tooltip Close
+      .row.modal-row
+        input#edit-group-chat-title(type='text' placeholder='Enter Group Name')
+        input#edit-group-chat-description(type='text' placeholder='Enter Description')
+      .row.modal-row
+        p#create-chat-error-field.error-field
+      #add-chat-save-button.save-button
+        label Create Group
+  #add-direct-chat-modal.modal
+    .modal-content
+      .modal-header
+        h1
+          | New Direct Message
+          span.modal-header-button
+            span.close.close-modal &times;
+            span.tooltip Close
+      .row.modal-row
+        input#add-direct-chat-search(type='text' placeholder='Search contacts by name')
+      #add-direct-chat-search-list
+      #cancel-direct-chat-button.save-button.cancel-button
+        label Cancel
+  #add-member-modal.modal
+    .modal-content
+      .modal-header
+        h1
+          | Add member
+          span.modal-header-button
+            span.close.close-modal &times;
+            span.tooltip Close
+      .row.modal-row
+        input#add-member-search(type='text' placeholder='Search contacts by name')
+      #add-member-search-list
+      #cancel-add-member-button.save-button.cancel-button
+        label Cancel
+  #new-group-add-member-modal.modal
+    .modal-content
+      .modal-header
+        h1
+          | Add members
+          span.modal-header-button
+            span.close.close-modal &times;
+            span.tooltip Close
+      .row.modal-row
+        input#new-group-add-member-search(type='text' placeholder='Search contacts by name')
+      #new-group-add-member-search-list
+      #new-group-cancel-add-member-button.save-button.cancel-button
+        label Cancel
+  #chat-setting-modal.modal
+    .modal-content
+      .modal-header
+        h1
+          | Settings for &quot;
+          strong#setting-chat-title chat
+          | &quot;
+        span.modal-header-button
+          span.close.close-modal &times;
+          span.tooltip Close
+      .line-break
+      .row.modal-row
+        #modal-chat-setting-profile-image.group-chat-picture
+          img(src='https://robohash.org/delete.png' alt='profile')
+          #edit-group-chat-image.edit-profile-image Edit
+        form#edit-group-chat-image-form(action='/api/chat/uploadGroupChatImage' method='POST' enctype='multipart/form-data')
+          input#edit-group-chat-image-chat-name(name='chat' type='text')
+          input#edit-group-chat-image-selector(name='group-chat-image' type='file' accept='image/*')
+          input#edit-group-chat-image-submit(type='submit')
+      .row.modal-row
+        label Group Name: 
+        input#modal-chat-setting-edit-group-name.edit-disabled(type='text' placeholder='Enter group name' disabled='')
+        #modal-chat-setting-edit-name-button.edit-button Edit
+      .row.modal-row
+        label Description: 
+        textarea#modal-chat-setting-edit-description.edit-disabled(rows='5' placeholder='Enter group Desription' maxlength='144' disabled='')
+        #modal-chat-setting-edit-description-button.edit-button Edit
+      .row.modal-row
+        p#modal-chat-setting-error-field.error-field
+      .line-break
+      .row.modal-row
+        #modal-chat-setting-leave-chat-button.leave-chat-button Leave Chat
+#chat-members-modal.modal
+  .modal-content
+    .modal-header
+      h1
+        strong#member-chat-count 22
+        |  Members of &quot;
+        strong#member-chat-title test chat
+        | &quot;
+      span.modal-header-button
+        span.close.close-modal &times;
+        span.tooltip Close
+    .line-break
+    #member-grid.member-grid
+      #chat-add-members.member-card
+        .profile-picture
+          label +
+        h2 Add Members
+script(src='/javascripts/config.js')
+script(src='/javascripts/util.js')
+script(src='/javascripts/jquery.emojiarea.js')
+script(src='/javascripts/emoji-picker.js')

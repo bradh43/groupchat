@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--Brad Hodkinson
+03/25/19
+CSE 330
+Module CP GroupChat-->
+
+<head>
+    <!-- Set up settings-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple multi-room chat">
+    <meta name="keywords" content="GroupChat">
+    <meta name="author" content="Brad Hodkinson">
+    <!-- <meta http-equiv="refresh" content="300"> -->
+
+    <!-- Link javascript and css-->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/stylesheets/emoji.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/root.css">
+    <link rel="stylesheet" href="/stylesheets/home.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/home.js"></script>
+    <title>GroupChat</title>
+</head>
+<div class="background">
+    <div class="side-nav-bar">
+        <ul>
+            <li class="home-menu">
+                <div class="primary-button" id="toggle-menu-button"><span class="tooltip" id="menu-tooltip">Menu</span><img src="/assets/icons/conversation.png" alt="menu"></div>
+            </li>
+            <li>
+                <div class="secondary-button" id="view-profile"><span class="tooltip" id="profile-tooltip">My Profile</span><img src="/assets/icons/user.png" alt="profile"></div>
+            </li>
+            <li>
+                <div class="secondary-button" id="view-chat-list"><span class="tooltip" id="chat-tooltip">Chats</span><img src="/assets/icons/group.png" alt="chats"></div>
+            </li>
+            <li>
+                <div class="secondary-button" id="view-contact-list"><span class="tooltip" id="contact-tooltip">Contacts</span><img src="/assets/icons/contact.png" alt="contacts"></div>
+            </li>
+            <li>
+                <div class="secondary-button" id="view-setting"><span class="tooltip" id="setting-tooltip">Settings</span><img src="/assets/icons/setting.png" alt="settings"></div>
+            </li>
+        </ul>
+    </div>
+    <div class="side-menu" id="side-menu">
+        <!-- Add create new chat with option for dm or group-->
+        <div class="drawer-top">
+            <div class="drawer-header">
+                <h2 id="drawer-title">Chats</h2>
+                <div class="secondary-button add-chat" id="add-chat-button"><span class="tooltip" id="add-tooltip">Add chat</span><img src="/assets/icons/edit.png" alt="add"></div>
+            </div>
+            <div class="line-break"></div>
+            <div class="edit-menu" id="edit-drop-down-menu">
+                <div class="edit-menu-item" id="add-group-chat"><img src="/assets/icons/group.png" alt="">
+                    <h3>Start Group</h3>
+                </div>
+                <div class="edit-menu-item" id="add-direct-chat"><img src="/assets/icons/user.png" alt="">
+                    <h3>Start Direct Message</h3>
+                </div>
+            </div>
+            <div class="search">
+                <form autocomplete="off">
+                    <input id="search-input" type="text" placeholder="Search Chats" autocomplete="off">
+                </form>
+            </div>
+        </div>
+        <div class="drawer-content">
+            <div class="chat-result" id="drawer-chat-list">
+                <img src="/assets/icons/loading.gif" alt="loading..." id="loading-chat-list">
+            </div>
+            <div class="chat-result" id="drawer-contact-list">
+                <img src="/assets/icons/loading.gif" alt="loading..." id="loading-contact-list">
+            </div>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="home" id="home"><img src="/assets/icons/logo.png" alt="Home">
+            <h4>Make it a great day, <strong id="welcome-username">Username</strong>.</h4>
+            <h4>Pop open a chat to start the conversation.</h4>
+        </div>
+        <div class="setting" id="setting">
+            <h1>Settings</h1>
+            <div class="setting-box">
+                <div class="line-break"></div>
+                <div class="row setting-row">
+                    <label >Time format: </label>
+                    <div class="setting-select">
+                        <select id="setting-time-format-select">
+                            <option value="0">Standard</option>
+                            <option value="1">Military</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="line-break"></div>
+                <div class="row setting-row">
+                    <label >Theme: </label>
+                    <div class="setting-select">
+                        <select id="setting-theme-select">
+                            <option value="0">Light</option>
+                            <option value="1">Dark</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="line-break"></div>
+                <div class="row setting-row">
+                    <div id="setting-logout-button">Logout</div>
+                </div>
+               
+            </div>
+
+        </div>
+
+        <div class="profile-page" id="profile-page">
+            <div class="row profile-row">
+                <div class="profile-picture">
+                    <img src="https://robohash.org/Username.png" alt="profile" id="profile-user-picture">
+                    <div class="edit-profile-image" id="edit-profile-image">Edit</div>   
+                    <form action="/api/chat/uploadProfileImage" method="POST" enctype="multipart/form-data">
+                        <input name="profile-image" type="file" id="edit-profile-image-selector" accept="image/*">
+                        <input type="submit" id="edit-profile-image-submit">
+                    </form>     
+                </div>        
+            </div>
+            <div class="row profile-row">
+                <h2 id="profile-username">Username</h2>                
+            </div>
+
+            <div class="row profile-row">
+                <label>First Name: </label>
+                <input id="profile-edit-first-name" class="edit-disabled" type="text" placeholder="First Name" disabled>
+                <div class="edit-button" id="profile-edit-first-name-button">Edit</div>
+            </div>
+            <div class="row profile-row">
+                <label>Last Name: </label>
+                <input id="profile-edit-last-name" class="edit-disabled" type="text" placeholder="Laste Name" disabled>
+                <div class="edit-button" id="profile-edit-last-name-button">Edit</div>
+            </div>
+            <div class="row profile-row">
+                <label>Email: </label>
+                <input id="profile-edit-email" class="edit-disabled" type="text" placeholder="Email" disabled>
+                <div class="edit-button" id="profile-edit-email-button">Edit</div>
+            </div>
+            <div class="row profile-row">
+                <label>Password:</label><label class="profile-password-label" id="profile-password-label">********</label>
+                <input id="profile-edit-current-password" type="password" placeholder="Current Password">
+                <div class="edit-button" id="profile-edit-password-button">Edit</div>
+            </div>
+            <div class="row profile-row">
+                <input id="profile-edit-new-password" type="password" placeholder="New Password">
+            </div>
+            <div class="row profile-row">
+                <input id="profile-edit-confirm-password" type="password" placeholder="Confirm Password">
+                <div class="profile-save-button" id="profile-save-password-button">Save</div>
+                <div class="profile-cancel-button" id="profile-cancel-password-button">Cancel</div>
+            </div>
+            <div class="row profile-row">
+                <p id="profile-error-field"></p>
+            </div>
+            <div class="line-break"></div>
+            <div class="row profile-row">
+                <div id="delete-account-button">Delete Account</div>
+            </div>
+            <div class="row profile-row">
+                <div id="profile-logout-button">Logout</div>
+            </div>
+        </div>
+        <div class="title-bar" id="header-title-bar">
+
+        </div>
+        <div class="hamburger-menu" id="hamburger">
+            <div class="hamburger-button">
+                <span class="line line1"></span>
+                <span class="line line2"></span>
+                <span class="line line3"></span>
+            </div> 
+        </div>
+        <div class="hamburger-slide-menu" id="hamburger-slide-menu">
+            <div class="hamburger-menu-content">
+                <ul>
+                    <li id="hamburger-chat-button">Chats</li>
+                    <li id="hamburger-contact-button">Contacts</li>
+                    <li id="hamburger-profile-button">Profile</li>
+                    <li id="hamburger-setting-button">Settings</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="title-bar" id="chat-title-bar">
+            <div class="group-chat-picture">
+                <img id="group-chat-header-picture" src="https://robohash.org/delete.png" alt="profile">
+            </div>
+            <h1 id="chat-title-bar-header">Group Chat Name</h1>
+            <span class="title-bar-header-button"><span class="close close-chat" id="close-chat">&times;</span><span class="tooltip">Close</span></span>
+            <div class="title-bar-header-button">
+                <div id="group-chat-menu-button"></div>
+                <span class="tooltip">Chat Menu</span>
+            </div>
+                
+        </div>
+        <div class="chat-drop-down-menu hidden" id="chat-drop-down-menu">
+            <div class="row menu-row">
+                <p id="chat-description">Description</p>
+            </div>
+            <div class="line-break"></div>
+            <div class="group-chat-picture" id="chat-setting-profile-image"><img src="https://robohash.org/delete.png" alt="profile"></div>
+            <ul>
+                <li id="chat-member-button">
+                    <div class="row-icon"><img src="/assets/icons/group.png" alt="members"></div>
+                    <strong id="chat-member-count">22</strong> Members
+                </li>
+                <li id="chat-setting-button">
+                    <div class="row-icon"><img src="/assets/icons/setting.png" alt="settings"></div>
+                    Settings
+                </li>
+            </ul>
+        </div>
+        
+
+
+
+
+
+
+        <div class="message-list-scroll-field">
+            <div class="message-list" id="message-list" data-chat="">
+        
+            </div>
+        </div>
+        <div class="input-message-bar" id="input-message-bar"><input id="message-input" type="text" placeholder="Send Message..." data-emojiable="true">
+            <div class="send-button">
+                <div class="send-button"><span id="send-button"></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="add-group-chat-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>New Group<span class="modal-header-button"><span class="close close-modal">&times;</span><span class="tooltip">Close</span></span>
+                </h1>
+            </div>
+            <div class="row modal-row">
+                <input id="edit-group-chat-title" type="text" placeholder="Enter Group Name">
+                <input id="edit-group-chat-description" type="text" placeholder="Enter Description">
+            </div>
+            <div class="row modal-row">
+                <p class="error-field" id="create-chat-error-field"></p>
+            </div>
+            <div class="save-button" id="add-chat-save-button"><label>Create Group</label></div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-direct-chat-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>New Direct Message<span class="modal-header-button"><span class="close close-modal">&times;</span><span class="tooltip">Close</span></span>
+                </h1>
+            </div>
+            <div class="row modal-row"><input id="add-direct-chat-search" type="text" placeholder="Search contacts by name"></div>
+            <div id="add-direct-chat-search-list"></div>
+            <div class="save-button cancel-button" id="cancel-direct-chat-button"><label>Cancel</label></div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-member-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Add member<span class="modal-header-button"><span class="close close-modal">&times;</span><span class="tooltip">Close</span></span>
+                </h1>
+            </div>
+            <div class="row modal-row"><input id="add-member-search" type="text" placeholder="Search contacts by name"></div>
+            <div id="add-member-search-list"></div>
+            <div class="save-button cancel-button" id="cancel-add-member-button"><label>Cancel</label></div>
+        </div>
+    </div>
+
+    <div class="modal" id="new-group-add-member-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Add members<span class="modal-header-button"><span class="close close-modal">&times;</span><span class="tooltip">Close</span></span>
+                </h1>
+            </div>
+            <div class="row modal-row"><input id="new-group-add-member-search" type="text" placeholder="Search contacts by name"></div>
+            <div id="new-group-add-member-search-list"></div>
+            <div class="save-button cancel-button" id="new-group-cancel-add-member-button"><label>Cancel</label></div>
+        </div>
+    </div>
+
+    <div class="modal" id="chat-setting-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Settings for "<strong id="setting-chat-title">chat</strong>"</h1>
+                <span class="modal-header-button"><span class="close close-modal">&times;</span><span class="tooltip">Close</span></span>
+            </div>
+            <div class="line-break"></div>
+            <div class="row modal-row">
+                <div class="group-chat-picture" id="modal-chat-setting-profile-image">
+                    <img src="https://robohash.org/delete.png" alt="profile">
+                    <div class="edit-profile-image" id="edit-group-chat-image">Edit</div> 
+                </div>
+                <form action="/api/chat/uploadGroupChatImage" method="POST" enctype="multipart/form-data" id="edit-group-chat-image-form">
+                    <input name="chat" type="text" id="edit-group-chat-image-chat-name">
+                    <input name="group-chat-image" type="file" id="edit-group-chat-image-selector" accept="image/*">
+                    <input type="submit" id="edit-group-chat-image-submit">
+                </form>     
+            </div>
+            <div class="row modal-row">
+                <label>Group Name: </label>
+                <input id="modal-chat-setting-edit-group-name" class="edit-disabled" type="text" placeholder="Enter group name" disabled>
+                <div class="edit-button" id="modal-chat-setting-edit-name-button">Edit</div>
+            </div>
+            <div class="row modal-row">
+                <label>Description: </label>
+                <textarea id="modal-chat-setting-edit-description" class="edit-disabled" rows="5" placeholder="Enter group Desription" maxlength="144" disabled></textarea>
+                <div class="edit-button" id="modal-chat-setting-edit-description-button">Edit</div>
+            </div>
+            <div class="row modal-row">
+                <p class="error-field" id="modal-chat-setting-error-field"></p>
+            </div>
+            <div class="line-break"></div>
+            <div class="row modal-row">
+                <div class="leave-chat-button" id="modal-chat-setting-leave-chat-button">Leave Chat</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="chat-members-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1><strong id="member-chat-count">22</strong> Members of "<strong id="member-chat-title">test chat</strong>"</h1>
+            <span class="modal-header-button"><span class="close close-modal">&times;</span><span class="tooltip">Close</span></span>
+        </div>
+        <div class="line-break"></div>
+        <div class="member-grid" id="member-grid">
+            <div class="member-card" id="chat-add-members">
+                <div class="profile-picture">
+                    <label>+</label>
+                </div>
+                <h2>Add Members</h2>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+
+
+<script src="/javascripts/config.js"></script>
+<script src="/javascripts/util.js"></script>
+<script src="/javascripts/jquery.emojiarea.js"></script>
+<script src="/javascripts/emoji-picker.js"></script>
+</html>

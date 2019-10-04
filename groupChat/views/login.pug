@@ -1,0 +1,49 @@
+doctype html
+//
+  Brad Hodkinson
+  03/25/19
+  CSE 330
+  Module 6 GroupChat
+head
+  // Set up settings
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  meta(name='description' content='Simple multi-room chat')
+  meta(name='keywords' content='GroupChat')
+  meta(name='author' content='Brad Hodkinson')
+  // Link the icon, javascript and css
+  link(rel='shortcut icon' type='image/png' href='/assets/icons/favicon.ico')
+  link(rel='stylesheet' href='/stylesheets/root.css')
+  link(rel='stylesheet' href='/stylesheets/login.css')
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  script(src='/javascripts/login.js')
+  title GroupChat Login
+.login-background
+  .login-content
+    .card
+      .login-title
+        .login-row
+          img(src='/assets/icons/conversation.png' alt='cal')
+          h1 GroupChat
+        h2#login-header Sign In
+      form
+        .create-account.form-input
+          input#first-name(type='text' placeholder='First Name' autocomplete='off' required='')
+        .create-account.form-input
+          input#last-name(type='text' placeholder='Last Name' autocomplete='off' required='')
+        .login.form-input
+          input#username(type='text' placeholder='username' autocomplete='off' required='')
+        .create-account.form-input
+          input#email(type='email' placeholder='email' autocomplete='off' required='')
+        .login.form-input
+          input#password(type='password' placeholder='Password' autocomplete='off' required='')
+        .create-account.form-input
+          input#confirm-password(type='password' placeholder='Confirm Password' autocomplete='off' required='')
+      #login-button.login-button Log In
+      script(src='login.js')
+      #login-switch.login-switch
+        p
+          span#login-question New User?
+          strong#new-user Create Account
+      .error-field
+        p#error-message
