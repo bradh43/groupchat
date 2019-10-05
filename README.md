@@ -1,4 +1,4 @@
-# CSE 330 Creative Project #
+# Group Chat #
 
 # Running the program #
 Navigate to the groupchat folder and run npm install to download the node modules. Then run npm start or node app.js to run the program. You can also view the project here: http://ec2-18-219-118-115.us-east-2.compute.amazonaws.com:3456/
